@@ -14,7 +14,7 @@ async function bootstrap() {
   // app.use(requestIp.mw());
 
   const config = new DocumentBuilder()
-    .setTitle('Api Swagger')
+    .setTitle('Api Swagger (Product)')
     .setDescription('All api description')
     .setVersion('1.0')
     .addBearerAuth()
