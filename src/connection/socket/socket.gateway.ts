@@ -20,7 +20,6 @@ import { ForbiddenException } from '@nestjs/common';
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3010',
-      'http://202.151.182.145',
       'http://202.151.182.145:3000',
     ],
   },
