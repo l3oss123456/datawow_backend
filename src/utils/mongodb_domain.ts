@@ -11,7 +11,7 @@ export default {
     model = null,
     pipeline = [],
     page = 1,
-    per_page = 10,
+    per_page = 20,
     project = null,
     sort_field = null,
     sort_order = null,
@@ -26,6 +26,17 @@ export default {
   }): Promise<MongodbDomainResponseInterface> => {
     try {
       let _pipeline = [...pipeline];
+      if (!R.isNil(sort_field) && !R.isNil(sort_order)) {
+        _pipeline = [
+          ..._pipeline,
+          {
+            $sort: helper.ToConvertMongooseSortOrder({
+              sort_field,
+              sort_order,
+            }),
+          },
+        ];
+      }
 
       if (_pipeline.some((stage) => stage.$match)) {
         const existingMatchStageIndex = _pipeline.findIndex(
@@ -54,24 +65,6 @@ export default {
       if (!R.isNil(project)) {
         _pipeline = [..._pipeline, { $project: project }];
       }
-
-      if (!R.isNil(sort_field) && !R.isNil(sort_order)) {
-        _pipeline = [
-          ..._pipeline,
-          {
-            $sort: helper.ToConvertMongooseSortOrder({
-              sort_field,
-              sort_order,
-            }),
-          },
-        ];
-      }
-
-      // const obj = await model.aggregate(_pipeline).exec();
-      // return {
-      //   description: 'success',
-      //   data: obj,
-      // };
 
       const countPipeline = [...pipeline]; // Create a separate pipeline for counting
       countPipeline.push({ $count: 'total_count' }); // Add $count stage to count documents

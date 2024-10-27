@@ -6,7 +6,7 @@ export interface ResponseTemplate {
 }
 
 export interface SuccessResponse {
-  data: any[] | object;
+  data: any[] | object | string;
   total?: number;
   page?: number;
   per_page?: number;

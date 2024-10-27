@@ -26,12 +26,11 @@ export class GeneralErrorFilter implements ExceptionFilter {
         });
       } else if (error instanceof UnauthorizedException) {
         const errorReponse = error.getResponse();
-        console.log('here');
-        console.log('error', error.getResponse());
-        response.status(errorReponse['statusCode']).json({
-          statusCode: errorReponse['statusCode'],
-          code: errorReponse['message']['code'],
-          description: errorReponse['message']['description'],
+
+        response.status(HttpStatus.UNAUTHORIZED).json({
+          statusCode: HttpStatus.UNAUTHORIZED,
+          code: errorReponse['message']['code'] ?? errorReponse['statusCode'],
+          description: errorReponse['message']['description'] ?? 'unauthorize',
         });
       } else if (error instanceof ForbiddenException) {
         const errorReponse = error.getResponse();
