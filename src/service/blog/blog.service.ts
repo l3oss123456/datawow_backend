@@ -337,7 +337,17 @@ export class BlogService {
 
       const obj = await mongodb_domain.MongodbAggregate({
         model: BlogModel,
-        pipeline: [...comment_blog_pipeline, ...user_pipeline],
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: [{ $toString: '$_id' }, blog_id],
+              },
+            },
+          },
+          ...comment_blog_pipeline,
+          ...user_pipeline,
+        ],
         project: { __v: 0, user_id: 0, user: 0, list_comment: 0 },
       });
 

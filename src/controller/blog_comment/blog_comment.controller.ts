@@ -2,14 +2,19 @@ import {
   CreateBlogCommentDTO,
   UpdateBlogCommentDTO,
 } from '@/dto/blog/blog_comment.dto';
+import { PaginationDTO, SortDTO } from '@/dto/global.dto';
 import { BlogCommentService } from '@/service/blog_comment/blog_comment.service';
+import * as R from 'ramda';
 import helper from '@/utils/helper';
+import responseHandler from '@/utils/responseHandler';
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -17,13 +22,39 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Blog-Comments')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'))
 @Controller('blog-comment')
 export class BlogCommentController {
   constructor(private readonly service: BlogCommentService) {}
 
+  @Get(`:blog_id`)
+  async getOneBlogCommentController(
+    @Param('blog_id') blog_id: string,
+    @Query() { page, per_page }: PaginationDTO,
+    @Query() { sort_field, sort_order }: SortDTO,
+  ) {
+    const obj = await this.service.getAlllBlogCommentService({
+      blog_id: blog_id,
+      sort_field,
+      sort_order,
+      page,
+      per_page,
+    });
+
+    return responseHandler.Success({
+      results: {
+        data: obj.data,
+        total: obj.total,
+        page: !R.isNil(page) ? Number(page) : null,
+        per_page: !R.isNil(per_page) ? Number(per_page) : null,
+      },
+    });
+  }
+
   @Post(`/`)
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  //   @ApiBearerAuth()
+  //   @UseGuards(AuthGuard('jwt'))
   @ApiConsumes('multipart/form-data')
   // @UseInterceptors(FileFieldsInterceptor([{ name: 'image' }]))
   createBlogCommentController(
@@ -40,8 +71,8 @@ export class BlogCommentController {
   }
 
   @Patch(`/:blog_comment_id`)
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  //   @ApiBearerAuth()
+  //   @UseGuards(AuthGuard('jwt'))
   @ApiConsumes('multipart/form-data')
   // @UseInterceptors(FileFieldsInterceptor([{ name: 'image' }]))
   updateBlogCommentController(
